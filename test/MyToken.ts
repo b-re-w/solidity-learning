@@ -33,8 +33,12 @@ describe("mytoken deploy", () => {
         expect(await myTokenC.balanceOf(signers[0].address)).to.equal(hre.ethers.parseUnits("999900", 18));
         expect(await myTokenC.balanceOf(signers[1].address)).to.equal(hre.ethers.parseUnits("100", 18));
     });
-    it("should not transfer", async () => {
+    it("should be reverted with insufficient balance error", async () => {
         // 잔액 부족으로 트랜잭션 실패 확인 (revert 예상)
+        await expect(
+            myTokenC.transfer(signers[1].address, hre.ethers.parseUnits("1000000000", 18))
+        ).to.be.revertedWith("Insufficient balance");
+        // 또는 try-catch 문으로도 확인 가능
         try {
             await myTokenC.transfer(signers[1].address, hre.ethers.parseUnits("1000000000", 18));
             expect.fail("트랜잭션이 성공하면 안 됩니다"); // revert 안되면 테스트 실패
