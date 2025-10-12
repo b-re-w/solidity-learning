@@ -12,6 +12,8 @@ contract MyToken {
 
     uint256 public totalSupply;  // 총 발행량
     mapping(address => uint256) public balanceOf;  // 각 주소의 잔액
+    // - balanceOf(), totalSupply() 조회: 트랜잭션 X, 가스비 무료, 즉시 반환
+    // - transfer(), _mint() 실행: 트랜잭션 O, 가스비 필요, 블록 생성 대기
 
     constructor(string memory _name, string memory _symbol, uint8 _decimals) {
         name = _name;
@@ -28,5 +30,15 @@ contract MyToken {
         // 토큰 발행
         totalSupply += amount;
         balanceOf[owner] += amount;
+    }
+
+    function transfer(address to, uint256 amount) external returns (bool) {
+        // 토큰 전송 (트랜젝션)
+        require(balanceOf[msg.sender] >= amount, "Insufficient balance");
+
+        balanceOf[msg.sender] -= amount;
+        balanceOf[to] += amount;
+
+        return true;
     }
 }
