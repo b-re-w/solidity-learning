@@ -6,6 +6,9 @@ pragma solidity ^0.8.28;
 // Smart Contract Token은 네이티브 x
 
 contract MyToken {
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    // indexed: 필터링 가능 (최대 3개)
+
     string public name = "MyToken";  // 토큰 이름
     string public symbol = "MTK";  // 토큰 심볼
     uint8 public decimals = 18;  // 소수점 이하 자리수
@@ -24,6 +27,7 @@ contract MyToken {
 
         _mint(msg.sender, amount);  // 배포자(transaction sender)에게 총 발행량 할당
                                     // 토큰 추가 발행 불가 (고정 공급량)
+        emit Transfer(address(0), msg.sender, amount);  // 발행 이벤트 (from: 0 주소)
     }
 
     function _mint(address owner, uint256 amount) internal {
@@ -38,6 +42,7 @@ contract MyToken {
 
         balanceOf[msg.sender] -= amount;
         balanceOf[to] += amount;
+        emit Transfer(msg.sender, to, amount);
 
         return true;
     }
