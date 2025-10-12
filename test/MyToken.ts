@@ -21,9 +21,9 @@ describe("mytoken deploy", () => {
         expect(await myTokenC.decimals()).to.equal(18);
     });
     it("should return totalSupply", async () => {
-        expect(await myTokenC.totalSupply()).to.equal(0);
+        expect(await myTokenC.totalSupply()).to.equal(1_000_000n * 10n ** 18n);
     });
     it("should return balanceOf", async () => {
-        expect(await myTokenC.balanceOf(signers[0].address)).to.equal(0);
+        expect(await myTokenC.balanceOf(signers[0].address)).to.equal(1_000_000n * 10n ** 18n);
     });
 });
