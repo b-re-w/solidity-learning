@@ -15,12 +15,12 @@ contract MyToken {
     // - balanceOf(), totalSupply() 조회: 트랜잭션 X, 가스비 무료, 즉시 반환
     // - transfer(), _mint() 실행: 트랜잭션 O, 가스비 필요, 블록 생성 대기
 
-    constructor(string memory _name, string memory _symbol, uint8 _decimals) {
+    constructor(string memory _name, string memory _symbol, uint8 _decimals, uint256 _initialSupply) {
         name = _name;
         symbol = _symbol;
         decimals = _decimals;
 
-        uint256 amount = 1000000 * (10 ** uint256(decimals));  // 1,000,000 토큰 (소수점 고려)
+        uint256 amount = _initialSupply * (10 ** uint256(decimals));  // 1,000,000 토큰 (소수점 고려)
 
         _mint(msg.sender, amount);  // 배포자(transaction sender)에게 총 발행량 할당
                                     // 토큰 추가 발행 불가 (고정 공급량)
