@@ -8,6 +8,7 @@ pragma solidity ^0.8.28;
 contract MyToken {
     event Transfer(address indexed from, address indexed to, uint256 value);
     // indexed: 필터링 가능 (최대 3개)
+    event Approval(address indexed spender, uint256 value);
 
     string public name = "MyToken";  // 토큰 이름
     string public symbol = "MTK";  // 토큰 심볼
@@ -17,6 +18,8 @@ contract MyToken {
     mapping(address => uint256) public balanceOf;  // 각 주소의 잔액
     // - balanceOf(), totalSupply() 조회: 트랜잭션 X, 가스비 무료, 즉시 반환
     // - transfer(), _mint() 실행: 트랜잭션 O, 가스비 필요, 블록 생성 대기
+    mapping(address => mapping(address => uint256)) public allowance;
+    // owner => (spender => amount)
 
     constructor(string memory _name, string memory _symbol, uint8 _decimals, uint256 _initialSupply) {
         name = _name;
@@ -37,7 +40,7 @@ contract MyToken {
     }
 
     function transfer(address to, uint256 amount) external returns (bool) {
-        // 토큰 전송 (트랜젝션)
+        // 토큰 전송 (트랜젝션) by owner
         require(balanceOf[msg.sender] >= amount, "Insufficient balance");
 
         balanceOf[msg.sender] -= amount;
@@ -46,4 +49,37 @@ contract MyToken {
 
         return true;
     }
+
+    function approve(address spender, uint256 amount) external returns (bool) {
+        // 토큰 사용 권한 위임 (트랜젝션) by owner
+        allowance[msg.sender][spender] = amount;
+        emit Approval(spender, amount);
+        return true;
+    }
+
+    function transferFrom(address from, address to, uint256 amount) external returns (bool) {
+        // 토큰 전송 (트랜젝션) by spender
+        require(balanceOf[from] >= amount, "Insufficient balance");
+        require(allowance[from][msg.sender] >= amount, "Insufficient allowance");
+
+        allowance[from][msg.sender] -= amount;
+        balanceOf[from] -= amount;
+        balanceOf[to] += amount;
+        emit Transfer(from, to, amount);
+
+        return true;
+    }
 }
+
+
+/*
+approve
+- allow spender address to send my token
+transferFrom
+- spender: owner -> target address
+
+* token owner --> bank contract
+* token owner --> router contract --> bank contract
+* token owner --> router contract --> bank contract(multi contract)
+
+*/
