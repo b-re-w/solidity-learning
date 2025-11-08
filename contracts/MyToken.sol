@@ -1,17 +1,20 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
+import "./ManagedAccess.sol";
+
 // Token: Smart contract based
 // BTC, ETH, XRP, KAIA: Native Token (수수료는 네이티브로만)
 // Smart Contract Token은 네이티브 x
 
-contract MyToken {
+
+contract MyToken is ManagedAccess {
     event Transfer(address indexed from, address indexed to, uint256 value);
     // indexed: 필터링 가능 (최대 3개)
     event Approval(address indexed spender, uint256 value);
 
-    address public god = msg.sender;  // 배포자 주소 저장
-    address public manager = msg.sender;  // 관리자 주소 저장
+    //address public god = msg.sender;  // 배포자 주소 저장
+    //address public manager = msg.sender;  // 관리자 주소 저장
 
     string public name = "MyToken";  // 토큰 이름
     string public symbol = "MTK";  // 토큰 심볼
@@ -24,7 +27,9 @@ contract MyToken {
     mapping(address => mapping(address => uint256)) public allowance;
     // owner => (spender => amount)
 
-    constructor(string memory _name, string memory _symbol, uint8 _decimals, uint256 _initialSupply) {
+    constructor(
+        string memory _name, string memory _symbol, uint8 _decimals, uint256 _initialSupply
+    ) ManagedAccess(msg.sender, msg.sender) {
         name = _name;
         symbol = _symbol;
         decimals = _decimals;
@@ -34,23 +39,6 @@ contract MyToken {
         _mint(msg.sender, amount);  // 배포자(transaction sender)에게 총 발행량 할당
                                     // 토큰 추가 발행 불가 (고정 공급량)
         emit Transfer(address(0), msg.sender, amount);  // 발행 이벤트 (from: 0 주소)
-    }
-
-    modifier onlyGod() {
-        // 소유자만 실행 가능
-        require(msg.sender == god, "You are not authorized! Only god can call this function");
-        _;
-    }
-
-    modifier onlyManager() {
-        // 관리자만 실행 가능
-        require(msg.sender == manager, "You are not authorized! Only manager can call this function");
-        _;
-    }
-
-    function setManager(address newManager) external onlyGod {
-        // 관리자 변경
-        manager = newManager;
     }
 
     function mint(address owner, uint256 amount) external onlyManager {
