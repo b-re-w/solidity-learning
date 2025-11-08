@@ -40,9 +40,11 @@ contract TinyBank {
 
     function withdraw(uint256 amount) external {
         // MyToken 토큰 인출
-        require(staked[msg.sender] >= amount, "Insufficient balance");
-        staked[msg.sender] -= amount;
+        require(staked[msg.sender] >= amount, "Insufficient staked tokens");
         require(stakingToken.transfer(msg.sender, amount), "Transfer failed");
+        staked[msg.sender] -= amount;
+        totalStaked -= amount;
+        emit Withdrawn(msg.sender, amount);
     }
 
     function getBalance() external view returns (uint256) {
