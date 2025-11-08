@@ -13,9 +13,6 @@ contract MyToken is ManagedAccess {
     // indexed: 필터링 가능 (최대 3개)
     event Approval(address indexed spender, uint256 value);
 
-    //address public god = msg.sender;  // 배포자 주소 저장
-    //address public manager = msg.sender;  // 관리자 주소 저장
-
     string public name = "MyToken";  // 토큰 이름
     string public symbol = "MTK";  // 토큰 심볼
     uint8 public decimals = 18;  // 소수점 이하 자리수

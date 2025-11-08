@@ -3,8 +3,8 @@ pragma solidity ^0.8.28;
 
 
 abstract contract ManagedAccess {
-    address public god;
-    address public manager;
+    address public god;  // 배포자
+    address public manager;  // 관리자
 
     constructor(address _god, address _manager) {
         god = _god;
