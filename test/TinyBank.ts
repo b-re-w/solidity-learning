@@ -49,4 +49,24 @@ describe("TinyBank", () => {
             );
         });
     });
+
+    describe("rewarding", () => {
+        it("should reward 1MT every blocks", async () => {
+            const signer0 = signers[0];
+            const stakeAmount = hre.ethers.parseUnits("50", DECIMALS);
+            await myTokenC.approve(await tinyBankC.getAddress(), stakeAmount);
+            await tinyBankC.stake(stakeAmount);
+
+            const BLOCKS = 5n;
+            const transferAmount = hre.ethers.parseUnits("1", DECIMALS);
+            for (let i = 0; i < BLOCKS; i++) {
+                await myTokenC.transfer(signer0.address, transferAmount);
+            }
+
+            await tinyBankC.withdraw(stakeAmount);
+            expect(await myTokenC.balanceOf(signer0.address)).equal(
+                hre.ethers.parseUnits((BLOCKS + MINTING_AMOUNT + 1n).toString())
+            );
+        });
+    });
 });
