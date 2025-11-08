@@ -46,12 +46,15 @@ contract TinyBank {
     }
 
     // who, when?
-    function distributeRewards(address to) internal {
+    // totalStaked 0: genesis staking + lastClaimedBlock update
+    function updateReward(address to) internal {
         // 불공평한 구현 (임시)
-        uint256 blocks = block.number - lastClaimedBlock[to];
-        uint256 reward = (blocks * rewardPerBlock * staked[to]) / totalStaked;
-        if (reward > 0) {
-            stakingToken.mint(to, reward);
+        if (staked[to] > 0) {
+            uint256 blocks = block.number - lastClaimedBlock[to];
+            uint256 reward = (blocks * rewardPerBlock * staked[to]) / totalStaked;
+            if (reward > 0) {
+                stakingToken.mint(to, reward);
+            }
         }
         lastClaimedBlock[to] = block.number;
     }
@@ -59,7 +62,7 @@ contract TinyBank {
     function stake(uint256 amount) external {
         // MyToken 토큰 예치
         require(stakingToken.transferFrom(msg.sender, address(this), amount), "Transfer failed");
-        distributeRewards(msg.sender);
+        updateReward(msg.sender);
         staked[msg.sender] += amount;
         totalStaked += amount;
         emit Staked(msg.sender, amount);
@@ -69,7 +72,7 @@ contract TinyBank {
         // MyToken 토큰 인출
         require(staked[msg.sender] >= amount, "Insufficient staked tokens");
         require(stakingToken.transfer(msg.sender, amount), "Transfer failed");
-        distributeRewards(msg.sender);
+        updateReward(msg.sender);
         staked[msg.sender] -= amount;
         totalStaked -= amount;
         emit Withdrawn(msg.sender, amount);
