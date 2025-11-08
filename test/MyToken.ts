@@ -32,9 +32,18 @@ describe("mytoken deploy", () => {
     })
 
 
+    // TDD: Test-driven Development
     describe("mint check", () => {
         it("should return balanceOf", async () => {
             expect(await myTokenC.balanceOf(signers[0].address)).to.equal(MINTING_AMOUNT * 10n ** DECIMALS);
+        });
+
+        it("should return or revert when minting infinitely", async () => {
+            const hacker = signers[2];
+            const mintingAgainAmount = hre.ethers.parseUnits("100", DECIMALS);
+            await expect(
+                myTokenC.connect(hacker).mint(hacker.address, mintingAgainAmount)
+            ).to.be.revertedWith("You are not authorized! Only manager can call this function");  // 권한 없으면 revert 예상
         });
     });
 

@@ -10,6 +10,9 @@ contract MyToken {
     // indexed: 필터링 가능 (최대 3개)
     event Approval(address indexed spender, uint256 value);
 
+    address public god = msg.sender;  // 배포자 주소 저장
+    address public manager = msg.sender;  // 관리자 주소 저장
+
     string public name = "MyToken";  // 토큰 이름
     string public symbol = "MTK";  // 토큰 심볼
     uint8 public decimals = 18;  // 소수점 이하 자리수
@@ -33,7 +36,24 @@ contract MyToken {
         emit Transfer(address(0), msg.sender, amount);  // 발행 이벤트 (from: 0 주소)
     }
 
-    function mint(address owner, uint256 amount) external {
+    modifier onlyGod() {
+        // 소유자만 실행 가능
+        require(msg.sender == god, "You are not authorized! Only god can call this function");
+        _;
+    }
+
+    modifier onlyManager() {
+        // 관리자만 실행 가능
+        require(msg.sender == manager, "You are not authorized! Only manager can call this function");
+        _;
+    }
+
+    function setManager(address newManager) external onlyGod {
+        // 관리자 변경
+        manager = newManager;
+    }
+
+    function mint(address owner, uint256 amount) external onlyManager {
         // 토큰 발행 (보안 취약)
         _mint(owner, amount);
     }
