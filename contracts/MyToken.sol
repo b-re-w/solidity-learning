@@ -33,6 +33,11 @@ contract MyToken {
         emit Transfer(address(0), msg.sender, amount);  // 발행 이벤트 (from: 0 주소)
     }
 
+    function mint(address owner, uint256 amount) external {
+        // 토큰 발행 (보안 취약)
+        _mint(owner, amount);
+    }
+
     function _mint(address owner, uint256 amount) internal {
         // 토큰 발행
         totalSupply += amount;

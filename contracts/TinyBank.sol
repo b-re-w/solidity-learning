@@ -10,8 +10,20 @@ pragma solidity ^0.8.28;
 // - user token management
 // - user => deposit => TinyBank (contract address) => transfer(user to TinyBank)
 
+// Reward
+// - reward token: MyToken
+// - reward resources: 1 MT/block minting
+// - reward strategy: staked[user] / total staked distribution
+//
+// - signer0 block 0 staking
+// - signer1 block 5 staking
+// - 0-- 1- 2-- 3-- 4-- 5--
+//   |                  |
+// - signer0 10MT       signer1 10MT
+
 
 interface IMyToken {
+    function mint(address owner, uint256 amount) external;
     function transferFrom(address from, address to, uint256 amount) external returns (bool);
     function transfer(address to, uint256 amount) external returns (bool);
 }
@@ -23,6 +35,9 @@ contract TinyBank {
 
     IMyToken public stakingToken;  // MyToken contract
 
+    mapping(address => uint256) public lastClaimedBlock;
+    uint256 rewardPerBlock = 1e18; // 1 MT/block
+
     mapping(address => uint256) public staked;  // user address => staked amount
     uint256 public totalStaked;  // total staked tokens
 
@@ -30,9 +45,21 @@ contract TinyBank {
         stakingToken = _stakingToken;
     }
 
+    // who, when?
+    function distributeRewards(address to) internal {
+        // 불공평한 구현 (임시)
+        uint256 blocks = block.number - lastClaimedBlock[to];
+        uint256 reward = (blocks * rewardPerBlock * staked[to]) / totalStaked;
+        if (reward > 0) {
+            stakingToken.mint(to, reward);
+        }
+        lastClaimedBlock[to] = block.number;
+    }
+
     function stake(uint256 amount) external {
         // MyToken 토큰 예치
         require(stakingToken.transferFrom(msg.sender, address(this), amount), "Transfer failed");
+        distributeRewards(msg.sender);
         staked[msg.sender] += amount;
         totalStaked += amount;
         emit Staked(msg.sender, amount);
@@ -42,6 +69,7 @@ contract TinyBank {
         // MyToken 토큰 인출
         require(staked[msg.sender] >= amount, "Insufficient staked tokens");
         require(stakingToken.transfer(msg.sender, amount), "Transfer failed");
+        distributeRewards(msg.sender);
         staked[msg.sender] -= amount;
         totalStaked -= amount;
         emit Withdrawn(msg.sender, amount);
