@@ -2,6 +2,12 @@
 pragma solidity ^0.8.28;
 
 
+// Centralization vs Decentralization
+// Distributed Ledger Technology (DLT)
+// Governance
+// - on-chain governance: voting
+
+
 abstract contract ManagedAccess {
     address public god;  // 배포자
     address public manager;  // 관리자
