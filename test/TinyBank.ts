@@ -61,7 +61,6 @@ describe("TinyBank", () => {
             for (let i = 0; i < Number(managerCount); i++) {
                 await tinyBankC.connect(signers[i]).confirm();
             }
-            console.log(managerCount)
             await expect(
                 tinyBankC.connect(manager).addManager(newManagerAddress)
             ).to.not.be.reverted;
