@@ -69,5 +69,13 @@ describe("TinyBank", () => {
                 hre.ethers.parseUnits((BLOCKS + MINTING_AMOUNT + 1n).toString())
             );
         });
+
+        it("should revert when changing rewardPerBlock by hacker", async () => {
+            const signer3 = signers[3];
+            const rewardToChange = hre.ethers.parseUnits("10", DECIMALS);
+            await expect(tinyBankC.connect(signer3).setRewardPerBlock(rewardToChange)).to.be.revertedWith(
+                "You are not authorized! Only manager can call this function"
+            )
+        });
     });
 });
