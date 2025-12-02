@@ -6,10 +6,18 @@ contract NativeBank {
     mapping(address => uint256) public balanceOf;
 
     function withdraw(uint256 amount) external {
-        require(balanceOf[msg.sender] >= amount, "Insufficient balance");
-        //payable(msg.sender).transfer(amount);
-        (bool success, ) = msg.sender.call{value: amount}("");
-        balanceOf[msg.sender] -= amount;
+        uint256 balance = balanceOf[msg.sender];
+        require(balance > 0, "insufficient balance");
+
+        (bool success, ) = msg.sender.call{value: amount}("");  // 호출자에게 제어권을 이동 (재진입 가능)
+        require(success, "failed to send native token");
+
+        balanceOf[msg.sender] = 0;
+
+        //require(balanceOf[msg.sender] >= amount, "Insufficient balance");
+        ////payable(msg.sender).transfer(amount);
+        //(bool success, ) = msg.sender.call{value: amount}("");
+        //balanceOf[msg.sender] -= amount;
     }
 
     receive() external payable {
