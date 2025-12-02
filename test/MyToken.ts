@@ -35,7 +35,11 @@ describe("mytoken deploy", () => {
     // TDD: Test-driven Development
     describe("mint check", () => {
         it("should return balanceOf", async () => {
-            expect(await myTokenC.balanceOf(signers[0].address)).to.equal(MINTING_AMOUNT * 10n ** DECIMALS);
+            const signer0 = signers[0];
+            const oneMt = hre.ethers.parseUnits("1", DECIMALS);
+            await myTokenC.mint(oneMt, signer0.address);
+
+            expect(await myTokenC.balanceOf(signer0.address)).equal(MINTING_AMOUNT * 10n ** DECIMALS + oneMt);
         });
 
         it("should return or revert when minting infinitely", async () => {
