@@ -9,10 +9,12 @@ contract NativeBank {
         uint256 balance = balanceOf[msg.sender];
         require(balance > 0, "insufficient balance");
 
-        (bool success, ) = msg.sender.call{value: amount}("");  // 호출자에게 제어권을 이동 (재진입 가능)
+        balanceOf[msg.sender] = 0;  // (방법 1) 상태 변경: 재진입 공격 방어
+
+        (bool success, ) = msg.sender.call{value: amount}("");  // 호출자에게 제어권을 이동 (재진입 가능!)
         require(success, "failed to send native token");
 
-        balanceOf[msg.sender] = 0;
+        //balanceOf[msg.sender] = 0;  // 재진입 방지를 위해 위치 이동
 
         //require(balanceOf[msg.sender] >= amount, "Insufficient balance");
         ////payable(msg.sender).transfer(amount);
