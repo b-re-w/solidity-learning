@@ -37,7 +37,7 @@ describe("mytoken deploy", () => {
         it("should return balanceOf", async () => {
             const signer0 = signers[0];
             const oneMt = hre.ethers.parseUnits("1", DECIMALS);
-            await myTokenC.mint(oneMt, signer0.address);
+            await myTokenC.mint(signer0.address, oneMt);
 
             expect(await myTokenC.balanceOf(signer0.address)).equal(MINTING_AMOUNT * 10n ** DECIMALS + oneMt);
         });
@@ -69,7 +69,7 @@ describe("mytoken deploy", () => {
             const logs = await myTokenC.queryFilter(filter, 0, "latest");  // 0부터 최신 블록까지
             //console.log("필터링된 Transfer 이벤트:", logs);
             expect(logs.length).to.equal(1);
-            expect(logs[0].args?.from).to.equal(signers[0].address);
+            expect(logs[0].args?.owner).to.equal(signers[0].address);
             expect(logs[0].args?.to).to.equal(signers[1].address);
             expect(logs[0].args?.value).to.equal(hre.ethers.parseUnits("1", DECIMALS));
         });

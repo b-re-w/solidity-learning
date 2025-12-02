@@ -9,7 +9,7 @@ import "./ManagedAccess.sol";
 
 
 contract MyToken is ManagedAccess {
-    event Transfer(address indexed from, address indexed to, uint256 value);
+    event Transfer(address indexed owner, address indexed to, uint256 value);
     // indexed: 필터링 가능 (최대 3개)
     event Approval(address indexed spender, uint256 value);
 
