@@ -70,6 +70,16 @@ contract TinyBank is ManagedAccess {
         rewardPerBlock = _rewardPerBlock;
     }
 
+    function currentReward(address to) external view returns (uint256) {
+        if (staked[to] > 0) {
+            uint256 blocks = block.number - lastClaimedBlock[to];
+            uint256 reward = (blocks * rewardPerBlock * staked[to]) / totalStaked;
+            return reward;
+        } else {
+            return 0;
+        }
+    }
+
     function stake(uint256 amount) external updateReward(msg.sender) {
         // MyToken 토큰 예치
         require(stakingToken.transferFrom(msg.sender, address(this), amount), "Transfer failed");

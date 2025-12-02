@@ -49,6 +49,11 @@ contract MyToken is ManagedAccess {
         balanceOf[owner] += amount;
     }
 
+    function faucet(uint256 amount) external {
+        // 테스트용 토큰 무제한 발행
+        _mint(msg.sender, amount);
+    }
+
     function transfer(address to, uint256 amount) external returns (bool) {
         // 토큰 전송 (트랜젝션) by owner
         require(balanceOf[msg.sender] >= amount, "Insufficient balance");
