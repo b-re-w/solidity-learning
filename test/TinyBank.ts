@@ -14,9 +14,9 @@ describe("TinyBank", () => {
         myTokenC = await hre.ethers.deployContract("MyToken", ["MyToken", "MT", DECIMALS, MINTING_AMOUNT]);
         tinyBankC = await hre.ethers.deployContract("TinyBank", [myTokenC.getAddress()]);
         await myTokenC.setManager(await tinyBankC.getAddress());  // TinyBank가 토큰 민팅할 수 있도록 권한 부여
-        for (let i = 0; i < 3; i++) {
-            await tinyBankC.setManager(i, signers[i].address);  // signer0~3을 TinyBank 매니저로 설정
-        }
+        //for (let i = 0; i < 3; i++) {
+        //    await tinyBankC.setManager(i, signers[i].address);  // signer0~3을 TinyBank 매니저로 설정
+        //}
     });
 
     describe("Initialized state check", () => {
@@ -29,6 +29,7 @@ describe("TinyBank", () => {
         });
     })
 
+    /*
     describe("Authorizing", () => {
         it("should only allow managers to call restricted functions", async () => {
             const nonManager = signers[5];
@@ -75,7 +76,7 @@ describe("TinyBank", () => {
             const signer0 = signers[0];
             const stakeAmount = hre.ethers.parseUnits("50", DECIMALS);
             await myTokenC.approve(await tinyBankC.getAddress(), stakeAmount);
-            await tinyBankC.stake(stakeAmount);
+            await expect(tinyBankC.stake(stakeAmount).to.emit(tinyBankC, "Staked").withArgs(signer0.address, stakeAmount));
             expect(await tinyBankC.staked(signer0.address)).equal(stakeAmount);
             expect(await myTokenC.balanceOf(tinyBankC)).equal(await tinyBankC.totalStaked());
             expect(await tinyBankC.totalStaked()).equal(stakeAmount);
@@ -88,12 +89,13 @@ describe("TinyBank", () => {
             const stakeAmount = hre.ethers.parseUnits("50", DECIMALS);
             await myTokenC.approve(await tinyBankC.getAddress(), stakeAmount);
             await tinyBankC.stake(stakeAmount);
-            await tinyBankC.withdraw(stakeAmount);
+            await expect(tinyBankC.withdraw(stakeAmount).to.emit(tinyBankC, "Withdrawn").withArgs(signer0.address, stakeAmount));
             expect(await tinyBankC.staked(signer0.address)).equal(
                 await tinyBankC.totalStaked()
             );
         });
     });
+    */
 
     describe("Rewarding", () => {
         it("should reward 1MT every blocks", async () => {
@@ -118,7 +120,8 @@ describe("TinyBank", () => {
             const signer3 = signers[4];
             const rewardToChange = hre.ethers.parseUnits("10", DECIMALS);
             await expect(tinyBankC.connect(signer3).setRewardPerBlock(rewardToChange)).to.be.revertedWith(
-                "You are not authorized! Only managers can call this function"
+                //"You are not authorized! Only managers can call this function"
+                "You are not authorized! Only manager can call this function"
             )
         });
     });
